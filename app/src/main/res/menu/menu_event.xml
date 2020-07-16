@@ -1,0 +1,16 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+    <item
+        android:id="@+id/event_action_deleted"
+        android:orderInCategory="110"
+        android:icon="@drawable/ic_baseline_delete_24"
+        android:title="@string/event_action_deleted"
+        app:showAsAction="ifRoom|withText"/>
+    <item
+        android:id="@+id/event_action_save"
+        android:orderInCategory="120"
+        android:icon="@drawable/ic_baseline_save_24"
+        android:title="@string/event_action_save"
+        app:showAsAction="ifRoom|withText"/>
+</menu>

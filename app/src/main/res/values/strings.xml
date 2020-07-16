@@ -1,0 +1,31 @@
+<resources>
+    <string name="app_name">Simple Event Reminders</string>
+    <string name="action_settings">Settings</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="events_fragment_label">События</string>
+    <string name="event_fragment_label">Запись</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+
+    <string name="hello_first_fragment">Hello first fragment</string>
+    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
+    <string name="events_item_name">Название</string>
+    <string name="events_item_change">Изменить</string>
+    <string name="events_item_status">Включить</string>
+    <string name="events_item_data">Дата</string>
+    <string name="event_name">Название</string>
+    <string name="event_desc">Описание</string>
+    <string name="event_save">Сохранить</string>
+    <string name="event_deleted">Удалить</string>
+    <string name="event_date">Дата напоминания</string>
+    <string name="date_picker_confirm">Готово</string>
+    <string name="date_picker_cancel">Отменить</string>
+    <string name="status_message_ok_save">Изменения сохранены</string>
+    <string name="status_message_ok_add">Событие добавлено</string>
+    <string name="status_message_ok_delete">Удален</string>
+    <string name="status_message_fall">Ошибка операции</string>
+    <string name="status_message_ok_load">Успешная загрузка</string>
+    <string name="event_action_save">Сохранить</string>
+    <string name="event_action_deleted">Удалить</string>
+    <string name="events_action_refresh">Обновить</string>
+</resources>
