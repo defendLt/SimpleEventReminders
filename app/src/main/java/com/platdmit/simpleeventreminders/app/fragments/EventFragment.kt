@@ -1,13 +1,12 @@
 package com.platdmit.simpleeventreminders.app.fragments
 
 import android.annotation.SuppressLint
-import android.app.Activity
-import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -18,6 +17,7 @@ import com.platdmit.simpleeventreminders.app.helpers.ActionButtonControl
 import com.platdmit.simpleeventreminders.app.vm.BaseViewModel
 import com.platdmit.simpleeventreminders.app.vm.EventViewModel
 import com.platdmit.simpleeventreminders.domains.model.Event
+import com.platdmit.simpleeventreminders.domains.state.EventState
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_event.*
 import org.joda.time.DateTime
@@ -33,24 +33,25 @@ class EventFragment : Fragment(R.layout.fragment_event),
         super.onCreate(savedInstanceState)
 
         hideActivityButton(false)
-
         setHasOptionsMenu(true)
 
         if (savedInstanceState == null){
             //Set active Event else new Event
-            eventViewModel.setEvent(
-                (arguments?.getParcelable("EVENT") as? Event)
-                    ?: Event(
-                        null, resources.getString(R.string.event_name),
-                        resources.getString(R.string.event_desc), null
-                    )
+            eventViewModel.setStateInstance(
+                EventViewModel.StateInstance.SetEvent(
+                    (arguments?.getParcelable("EVENT") as? Event)
+                        ?: Event(
+                            null, resources.getString(R.string.event_name),
+                            resources.getString(R.string.event_desc), null
+                        )
+                )
             )
         }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         eventViewModel.messageLiveData.observe(viewLifecycleOwner, Observer { statusMessageHandler(it) })
-        eventViewModel.eventLiveData.observe(viewLifecycleOwner, Observer { bindEventData(it) })
+        eventViewModel.eventStateLiveData.observe(viewLifecycleOwner, Observer { stateHandler(it) })
 
         eventDate.setOnClickListener {
             val dialogFragment = DatePickerFragment()
@@ -66,12 +67,18 @@ class EventFragment : Fragment(R.layout.fragment_event),
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when(item.itemId){
             R.id.event_action_save -> {
-                eventViewModel.saveEvent(eventName.text.toString(), eventDesc.text.toString())
+                eventViewModel.setStateInstance(
+                    EventViewModel.StateInstance.SaveEvent(
+                        eventName.text.toString(),
+                        eventDesc.text.toString()
+                    )
+                )
                 true
             }
             R.id.event_action_deleted -> {
-                eventViewModel.delEvent()
-                parentFragmentManager.popBackStack()
+                eventViewModel.setStateInstance(
+                    EventViewModel.StateInstance.DelEvent
+                )
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -81,12 +88,36 @@ class EventFragment : Fragment(R.layout.fragment_event),
     override fun onStop() {
         super.onStop()
         //Save data before change screen orientation
-        eventViewModel.changeEvent(eventName.text.toString(), eventDesc.text.toString())
+        eventViewModel.setStateInstance(
+            EventViewModel.StateInstance.UpdEvent(
+                eventName.text.toString(),
+                eventDesc.text.toString()
+            )
+        )
     }
 
     override fun onDestroy() {
         super.onDestroy()
         hideActivityButton(true)
+    }
+
+    private fun stateHandler(eventState: EventState<Event>){
+        when(eventState){
+            is EventState.LoadSuccess<Event> -> {
+                bindEventData(eventState.data)
+            }
+            is EventState.SaveSuccess -> {
+                showMessage(requireContext().getString(R.string.status_message_ok_save))
+            }
+            is EventState.CreateSuccess -> {
+                showMessage(requireContext().getString(R.string.status_message_ok_add))
+            }
+            is EventState.DeletedSuccess<Event> -> {
+                parentFragmentManager.setFragmentResult(REQUEST_KEY, bundleOf(SUCCESS_KEY to eventState.data.id))
+                showMessage(requireContext().getString(R.string.status_message_ok_delete))
+                parentFragmentManager.popBackStack()
+            }
+        }
     }
 
     private fun bindEventData(event : Event){
@@ -120,7 +151,14 @@ class EventFragment : Fragment(R.layout.fragment_event),
     }
 
     override fun onOkResultClick(date: DateTime) {
-        eventViewModel.changeDate(date)
+        eventViewModel.setStateInstance(
+            EventViewModel.StateInstance.UpdDateEvent(date)
+        )
         setStringDate(date)
+    }
+
+    companion object {
+        const val REQUEST_KEY = "ELEMENT_FRAGMENT"
+        const val SUCCESS_KEY = "ADD_ELEMENT_ID"
     }
 }

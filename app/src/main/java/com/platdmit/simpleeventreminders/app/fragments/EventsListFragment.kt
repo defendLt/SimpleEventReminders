@@ -1,26 +1,26 @@
 package com.platdmit.simpleeventreminders.app.fragments
 
 import android.os.Bundle
-import android.view.*
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
 import com.google.android.material.snackbar.Snackbar
-import com.platdmit.simpleeventreminders.MainApp
 import com.platdmit.simpleeventreminders.R
 import com.platdmit.simpleeventreminders.app.adapters.EventsListAdapter
 import com.platdmit.simpleeventreminders.app.fragments.helpers.OnShowMessageFragment
 import com.platdmit.simpleeventreminders.app.fragments.helpers.OnUpdateRecyclerView
 import com.platdmit.simpleeventreminders.app.vm.BaseViewModel
 import com.platdmit.simpleeventreminders.app.vm.EventsListViewModel
-import com.platdmit.simpleeventreminders.app.vm.factory.EventsViewModelFactory
-import com.platdmit.simpleeventreminders.domains.converters.EventsConverterImp
 import com.platdmit.simpleeventreminders.domains.model.Event
-import com.platdmit.simpleeventreminders.domains.repo.implement.EventsRepoImpl
-import com.platdmit.simpleeventreminders.domains.utilities.events.EventsListUseCase
-import com.platdmit.simpleeventreminders.domains.utilities.events.GetEventsUseCase
+import com.platdmit.simpleeventreminders.domains.state.EventListState
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_events.*
 
@@ -57,9 +57,37 @@ class EventsListFragment : Fragment(R.layout.fragment_events),
 
         events_list.layoutManager = LinearLayoutManager(context)
 
-        eventsListViewModel.eventsLiveData.observe(viewLifecycleOwner, Observer { bindEventsData(it) })
+        eventsListAdapter.stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
+
+        eventsListViewModel.eventsListStateLiveData.observe(viewLifecycleOwner, Observer { stateHandler(it) })
 
         eventsListViewModel.messageLiveData.observe(viewLifecycleOwner, Observer { statusMessageHandler(it) })
+
+        parentFragmentManager.setFragmentResultListener(
+            EventFragment.REQUEST_KEY, this
+        ) { requestKey: String, result: Bundle ->
+            val deletedItemId = result.getInt(EventFragment.SUCCESS_KEY)
+            eventsListAdapter.deletedItem(deletedItemId)
+            println("setFragmentResultListener $requestKey: $deletedItemId")
+        }
+    }
+
+    private fun stateHandler(eventListState: EventListState<List<Event>>){
+        when(eventListState){
+            is EventListState.Loading -> {
+                showMessage(requireContext().getString(R.string.status_message_load))
+            }
+            is EventListState.Success<List<Event>> -> {
+                bindEventsData(eventListState.data)
+                showMessage(requireContext().getString(R.string.status_message_ok_load))
+            }
+            is EventListState.Empty -> {
+                showMessage(requireContext().getString(R.string.status_message_empty))
+            }
+            is EventListState.Error -> {
+                showMessage(requireContext().getString(R.string.status_message_fall))
+            }
+        }
     }
 
     private fun bindEventsData(events : List<Event>){
@@ -81,6 +109,8 @@ class EventsListFragment : Fragment(R.layout.fragment_events),
     }
 
     override fun updateElementsList() {
-        eventsListViewModel.refreshResult()
+        eventsListViewModel.setStateInstance(
+            EventsListViewModel.StateInstance.RefreshResult
+        )
     }
 }

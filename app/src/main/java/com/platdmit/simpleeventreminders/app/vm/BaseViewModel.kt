@@ -5,14 +5,14 @@ import com.platdmit.simpleeventreminders.domains.model.Event
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.processors.BehaviorProcessor
 
-abstract class BaseViewModel : ViewModel() {
+abstract class BaseViewModel<T> : ViewModel() {
     protected val compositeDisposable = CompositeDisposable()
-    protected val contentProvider: BehaviorProcessor<List<Event>> = BehaviorProcessor.create<List<Event>>()
+    protected val stateProvider: BehaviorProcessor<T> = BehaviorProcessor.create<T>()
     protected val messageProvider: BehaviorProcessor<MessageType> = BehaviorProcessor.create<MessageType>()
 
     override fun onCleared() {
         super.onCleared()
-        contentProvider.onComplete()
+        stateProvider.onComplete()
         messageProvider.onComplete()
         compositeDisposable.clear()
     }

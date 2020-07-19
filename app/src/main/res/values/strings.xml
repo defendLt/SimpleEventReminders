@@ -28,4 +28,6 @@
     <string name="event_action_save">Сохранить</string>
     <string name="event_action_deleted">Удалить</string>
     <string name="events_action_refresh">Обновить</string>
+    <string name="status_message_empty">писок элементов пуст</string>
+    <string name="status_message_load">Загрузка</string>
 </resources>

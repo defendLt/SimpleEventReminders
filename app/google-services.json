@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "207139494573",
+    "firebase_url": "https://sampleeventreminders.firebaseio.com",
+    "project_id": "sampleeventreminders",
+    "storage_bucket": "sampleeventreminders.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:207139494573:android:5727e5f0faa17f57504424",
+        "android_client_info": {
+          "package_name": "com.platdmit.simpleeventreminders"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "207139494573-slrh6nsp8v5pb8g3rl2aks836iuep42d.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.platdmit.simpleeventreminders",
+            "certificate_hash": "80fc715388d53ec3bf8375996799cea337b1d128"
+          }
+        },
+        {
+          "client_id": "207139494573-l6tcg8u0nfes75cigu7l1ilekd13htke.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDFJ8SIaE7SgPaQ9koFBRuau93D0aQnD_0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "207139494573-l6tcg8u0nfes75cigu7l1ilekd13htke.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
