@@ -9,7 +9,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
 import com.google.android.material.snackbar.Snackbar
@@ -90,6 +89,10 @@ class EventsListFragment : Fragment(R.layout.fragment_events),
         }
     }
 
+    private fun setStateIntent(stateIntent: EventsListViewModel.StateIntent){
+        eventsListViewModel.setStateIntent(stateIntent)
+    }
+
     private fun bindEventsData(events : List<Event>){
         eventsListAdapter.setContentData(events)
         if(events_list.adapter == null){
@@ -109,8 +112,8 @@ class EventsListFragment : Fragment(R.layout.fragment_events),
     }
 
     override fun updateElementsList() {
-        eventsListViewModel.setStateInstance(
-            EventsListViewModel.StateInstance.RefreshResult
+        setStateIntent(
+            EventsListViewModel.StateIntent.RefreshResult
         )
     }
 }

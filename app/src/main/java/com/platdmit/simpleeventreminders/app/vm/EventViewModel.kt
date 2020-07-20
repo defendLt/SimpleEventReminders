@@ -3,7 +3,6 @@ package com.platdmit.simpleeventreminders.app.vm
 import androidx.hilt.Assisted
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveDataReactiveStreams
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import com.platdmit.simpleeventreminders.domains.model.Event
 import com.platdmit.simpleeventreminders.domains.state.EventState
@@ -15,30 +14,30 @@ class EventViewModel
 constructor(
     private val changeEventsUseCase: ChangeEventsUseCase,
     @Assisted private val savedStateHandle: SavedStateHandle
-) : BaseViewModel<EventViewModel.StateInstance>() {
+) : BaseViewModel<EventState<Event>>() {
+    var eventStateLiveData = LiveDataReactiveStreams.fromPublisher(stateProvider)
     val messageLiveData = LiveDataReactiveStreams.fromPublisher(messageProvider)
     var activeEvent : Event? = null;
-    var eventStateLiveData = MutableLiveData<EventState<Event>>()
 
     init {
-        eventStateLiveData.value = EventState.Loading
+        stateProvider.onNext(EventState.Loading)
     }
 
-    fun setStateInstance(stateInstance: StateInstance){
-        when(stateInstance){
-            is StateInstance.SetEvent -> {
-                setEvent(stateInstance.event)
+    fun setStateIntent(stateIntent: StateIntent){
+        when(stateIntent){
+            is StateIntent.SetEvent -> {
+                setEvent(stateIntent.event)
             }
-            is StateInstance.SaveEvent -> {
-                saveEvent(stateInstance.name, stateInstance.desc)
+            is StateIntent.SaveEvent -> {
+                saveEvent(stateIntent.name, stateIntent.desc)
             }
-            is StateInstance.UpdEvent -> {
-                changeEvent(stateInstance.name, stateInstance.desc)
+            is StateIntent.UpdEvent -> {
+                changeEvent(stateIntent.name, stateIntent.desc)
             }
-            is StateInstance.UpdDateEvent -> {
-                changeEventDate(stateInstance.date)
+            is StateIntent.UpdDateEvent -> {
+                changeEventDate(stateIntent.date)
             }
-            is StateInstance.DelEvent -> {
+            is StateIntent.DelEvent -> {
                 delEvent()
             }
         }
@@ -46,7 +45,7 @@ constructor(
 
     private fun setEvent(event: Event){
         activeEvent = event;
-        eventStateLiveData.value = EventState.LoadSuccess(event)
+        stateProvider.onNext(EventState.LoadSuccess(event))
     }
 
     private fun changeEvent(name : String, desc : String = ""){
@@ -66,19 +65,19 @@ constructor(
         if(activeEvent?.id != null){
             changeEventsUseCase.updEvent(activeEvent!!).subscribe(
                 {
-                    eventStateLiveData.value = EventState.SaveSuccess
+                    stateProvider.onNext(EventState.SaveSuccess)
                     messageProvider.onNext(MessageType.SUCCESS_SAVE)
                 },
                 {
+                    stateProvider.onNext(EventState.Error(it.localizedMessage?:""))
                     messageProvider.onNext(MessageType.FALL)
-                    eventStateLiveData.value = EventState.Error(it.localizedMessage?:"")
                 }
             )
         } else {
             changeEventsUseCase.addEvent(activeEvent!!).subscribe(
                 {
                     activeEvent?.id = it.toInt()
-                    eventStateLiveData.value = EventState.CreateSuccess
+                    stateProvider.onNext(EventState.CreateSuccess)
                     messageProvider.onNext(MessageType.SUCCESS_ADD)
                 },
                 { messageProvider.onNext(MessageType.FALL) }
@@ -89,7 +88,7 @@ constructor(
     private fun delEvent() {
         changeEventsUseCase.delEvent(activeEvent!!).subscribe(
             {
-                eventStateLiveData.value = EventState.DeletedSuccess(activeEvent!!)
+                stateProvider.onNext(EventState.DeletedSuccess(activeEvent!!))
                 messageProvider.onNext(MessageType.SUCCESS_DELETE)
             },
             {
@@ -98,11 +97,11 @@ constructor(
         )
     }
 
-    sealed class StateInstance {
-        data class SetEvent(val event: Event) : StateInstance()
-        data class SaveEvent(val name : String, val desc : String = "") : StateInstance()
-        data class UpdEvent(val name : String, val desc : String = "") : StateInstance()
-        data class UpdDateEvent(val date: DateTime) : StateInstance()
-        object DelEvent : StateInstance()
+    sealed class StateIntent {
+        data class SetEvent(val event: Event) : StateIntent()
+        data class SaveEvent(val name : String, val desc : String = "") : StateIntent()
+        data class UpdEvent(val name : String, val desc : String = "") : StateIntent()
+        data class UpdDateEvent(val date: DateTime) : StateIntent()
+        object DelEvent : StateIntent()
     }
 }

@@ -31,9 +31,9 @@ constructor(
         )
     }
 
-    fun setStateInstance(stateInstance: StateInstance){
-        when(stateInstance){
-            StateInstance.RefreshResult -> refreshResult()
+    fun setStateIntent(stateIntent: StateIntent){
+        when(stateIntent){
+            StateIntent.RefreshResult -> refreshResult()
         }
     }
 
@@ -41,7 +41,7 @@ constructor(
         getEventsUseCase.updateResult()
     }
 
-    sealed class StateInstance {
-        object RefreshResult : StateInstance()
+    sealed class StateIntent {
+        object RefreshResult : StateIntent()
     }
 }

@@ -1,7 +1,6 @@
 package com.platdmit.simpleeventreminders.app.vm
 
 import androidx.lifecycle.ViewModel
-import com.platdmit.simpleeventreminders.domains.model.Event
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.processors.BehaviorProcessor
 

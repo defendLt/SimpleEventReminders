@@ -37,8 +37,8 @@ class EventFragment : Fragment(R.layout.fragment_event),
 
         if (savedInstanceState == null){
             //Set active Event else new Event
-            eventViewModel.setStateInstance(
-                EventViewModel.StateInstance.SetEvent(
+            setStateIntent(
+                EventViewModel.StateIntent.SetEvent(
                     (arguments?.getParcelable("EVENT") as? Event)
                         ?: Event(
                             null, resources.getString(R.string.event_name),
@@ -67,8 +67,8 @@ class EventFragment : Fragment(R.layout.fragment_event),
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when(item.itemId){
             R.id.event_action_save -> {
-                eventViewModel.setStateInstance(
-                    EventViewModel.StateInstance.SaveEvent(
+                setStateIntent(
+                    EventViewModel.StateIntent.SaveEvent(
                         eventName.text.toString(),
                         eventDesc.text.toString()
                     )
@@ -76,8 +76,8 @@ class EventFragment : Fragment(R.layout.fragment_event),
                 true
             }
             R.id.event_action_deleted -> {
-                eventViewModel.setStateInstance(
-                    EventViewModel.StateInstance.DelEvent
+                setStateIntent(
+                    EventViewModel.StateIntent.DelEvent
                 )
                 true
             }
@@ -88,8 +88,8 @@ class EventFragment : Fragment(R.layout.fragment_event),
     override fun onStop() {
         super.onStop()
         //Save data before change screen orientation
-        eventViewModel.setStateInstance(
-            EventViewModel.StateInstance.UpdEvent(
+        setStateIntent(
+            EventViewModel.StateIntent.UpdEvent(
                 eventName.text.toString(),
                 eventDesc.text.toString()
             )
@@ -118,6 +118,10 @@ class EventFragment : Fragment(R.layout.fragment_event),
                 parentFragmentManager.popBackStack()
             }
         }
+    }
+
+    private fun setStateIntent(stateIntent: EventViewModel.StateIntent){
+        eventViewModel.setStateIntent(stateIntent)
     }
 
     private fun bindEventData(event : Event){
@@ -151,8 +155,8 @@ class EventFragment : Fragment(R.layout.fragment_event),
     }
 
     override fun onOkResultClick(date: DateTime) {
-        eventViewModel.setStateInstance(
-            EventViewModel.StateInstance.UpdDateEvent(date)
+        setStateIntent(
+            EventViewModel.StateIntent.UpdDateEvent(date)
         )
         setStringDate(date)
     }
