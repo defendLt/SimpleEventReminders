@@ -17,10 +17,14 @@ constructor(
 ) : BaseViewModel<EventState<Event>>() {
     var eventStateLiveData = LiveDataReactiveStreams.fromPublisher(stateProvider)
     val messageLiveData = LiveDataReactiveStreams.fromPublisher(messageProvider)
-    var activeEvent : Event? = null;
+    var activeEvent : Event? = null
 
     init {
         stateProvider.onNext(EventState.Loading)
+        setEvent(
+            savedStateHandle.get<Event>("EVENT")?:
+            Event(null, "", "", null)
+        )
     }
 
     fun setStateIntent(stateIntent: StateIntent){

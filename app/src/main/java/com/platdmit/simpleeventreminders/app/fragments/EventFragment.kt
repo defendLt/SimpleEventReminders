@@ -34,19 +34,6 @@ class EventFragment : Fragment(R.layout.fragment_event),
 
         hideActivityButton(false)
         setHasOptionsMenu(true)
-
-        if (savedInstanceState == null){
-            //Set active Event else new Event
-            setStateIntent(
-                EventViewModel.StateIntent.SetEvent(
-                    (arguments?.getParcelable("EVENT") as? Event)
-                        ?: Event(
-                            null, resources.getString(R.string.event_name),
-                            resources.getString(R.string.event_desc), null
-                        )
-                )
-            )
-        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -143,9 +130,9 @@ class EventFragment : Fragment(R.layout.fragment_event),
 
     private fun statusMessageHandler(messageType: BaseViewModel.MessageType){
         when(messageType){
-            BaseViewModel.MessageType.SUCCESS_SAVE -> showMessage(requireContext().getString(R.string.status_message_ok_save))
-            BaseViewModel.MessageType.SUCCESS_ADD -> showMessage(requireContext().getString(R.string.status_message_ok_add))
-            BaseViewModel.MessageType.SUCCESS_DELETE -> showMessage(requireContext().getString(R.string.status_message_ok_delete))
+            BaseViewModel.MessageType.SUCCESS_SAVE -> showMessage(getString(R.string.status_message_ok_save))
+            BaseViewModel.MessageType.SUCCESS_ADD -> showMessage(getString(R.string.status_message_ok_add))
+            BaseViewModel.MessageType.SUCCESS_DELETE -> showMessage(getString(R.string.status_message_ok_delete))
             else -> showMessage(requireContext().getString(R.string.status_message_fall))
         }
     }
