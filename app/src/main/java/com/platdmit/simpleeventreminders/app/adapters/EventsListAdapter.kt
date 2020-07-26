@@ -30,8 +30,18 @@ class EventsListAdapter : RecyclerView.Adapter<EventsListAdapter.EventsListViewH
     fun setContentData(events : List<Event>){
         eventList.clear()
         eventList.addAll(events)
-        eventList.forEach { println(it) }
         notifyDataSetChanged()
+    }
+
+    fun delItem(id: Int){
+        val index = eventList.indexOfFirst { it.id == id }
+        eventList.removeAt(index)
+        notifyItemRemoved(index)
+    }
+
+    fun addItem(event: Event){
+        eventList.add(event)
+        notifyItemInserted(eventList.lastIndex)
     }
 
     inner class EventsListViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
